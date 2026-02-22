@@ -38,8 +38,6 @@ docsearch = PineconeVectorStore.from_existing_index(
     embedding=embeddings
 )
 
-# FIX: Rename 'retriver' to 'retriever' for clarity 
-# (Standard LangChain convention uses 'retriever')
 retriever = docsearch.as_retriever(search_type="similarity", search_kwargs={"k":3})
 
 # Initialize Groq LLM
@@ -49,7 +47,7 @@ chatModel = ChatGroq(
     groq_api_key=GROQ_API_KEY
 )
 
-# Define Prompt
+# Prompt Definition
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
@@ -58,10 +56,8 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 # Build Chains
-# create_stuff_documents_chain takes (llm, prompt)
 question_answer_chain = create_stuff_documents_chain(chatModel, prompt)
 
-# create_retrieval_chain takes (retriever, combine_docs_chain)
 rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
 @app.route("/")
@@ -70,11 +66,8 @@ def index():
 
 @app.route("/get", methods=["GET", "POST"])
 def chat():
-    # 'msg' must match the 'name' attribute in your HTML input field
-    msg = request.form["msg"]
     
-    # Invoke the RAG chain
-    # The result is a dictionary containing 'context' and 'answer' keys
+    msg = request.form["msg"]
     response = rag_chain.invoke({"input": msg})
     
     print("Response : ", response["answer"])
