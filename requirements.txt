@@ -8,3 +8,4 @@ langchain-pinecone>=0.0.1
 langchain-huggingface>=0.0.1
 pinecone-client>=3.0.0
 sentence-transformers>=2.2.0
+langchain-classic>=0.1.0
