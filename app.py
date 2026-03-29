@@ -81,7 +81,7 @@ doctor_rag_chain = create_retrieval_chain(retriever, doctor_qa_chain)
 
 @app.route("/")
 def index():
-    return render_template('chat.html')
+    return render_template('web.html')
 
 @app.route("/api/chat", methods=["POST"])
 def chat_api():
