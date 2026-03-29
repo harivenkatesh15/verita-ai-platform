@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VeritaAI— Health Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script>
+  const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  
+  /* THEME VARIABLES - GLASSMORPHISM EDITION */
+  :root{
+    /* Light Mode */
+    --bg-base: #f0f4f8; 
+    --bg-orb-1: #34d399; 
+    --bg-orb-2: #38bdf8; 
+    --bg-orb-3: #fb7185; 
+    
+    /* Glass Surfaces */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-bg-hover: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-border-light: rgba(255, 255, 255, 0.8);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-blur: blur(16px);
+    
+    /* Elements */
+    --bg-alt: rgba(255, 255, 255, 0.5);
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --border-color: rgba(255, 255, 255, 0.5);
+    
+    /* Core Accents */
+    --teal: #0F6E56; 
+    --teal-mid: #1D9E75; 
+    --coral: #e11d48;
+    
+    /* Soft Backgrounds */
+    --teal-light: rgba(20, 184, 166, 0.15);
+    --coral-light: rgba(225, 29, 72, 0.1);
+    --warn-light: rgba(245, 158, 11, 0.15);
+    --err-light: rgba(225, 29, 72, 0.1);
+    --activity-bg: rgba(0, 0, 0, 0.05);
+    
+    /* Semantic Text/Borders */
+    --err-text: #be123c;
+    --err-border: rgba(254, 205, 211, 0.6);
+    --warn-text: #b45309;
+    --warn-icon: #d97706;
+    --warn-border: rgba(253, 230, 138, 0.6);
+    --disc-bg: rgba(254, 243, 199, 0.5);
+    --disc-border: rgba(251, 191, 36, 0.5);
+    --disc-text: #92400e;
+    
+    --white: #fff;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  [data-theme="dark"] {
+    /* Dark Mode */
+    --bg-base: #020617; 
+    --bg-orb-1: #064e3b; 
+    --bg-orb-2: #1e3a8a; 
+    --bg-orb-3: #881337; 
+    
+    /* Glass Surfaces */
+    --glass-bg: rgba(15, 23, 42, 0.65);
+    --glass-bg-hover: rgba(30, 41, 59, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-light: rgba(255, 255, 255, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    
+    /* Elements */
+    --bg-alt: rgba(30, 41, 59, 0.5);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: rgba(255, 255, 255, 0.08);
+    
+    /* Adjusted Accents for Dark Mode */
+    --teal: #10b981; 
+    --teal-mid: #34d399; 
+    --coral: #fb7185;
+    
+    /* Translucent Soft Backgrounds */
+    --teal-light: rgba(16, 185, 129, 0.15);
+    --coral-light: rgba(244, 63, 94, 0.15);
+    --warn-light: rgba(245, 158, 11, 0.15);
+    --err-light: rgba(239, 68, 68, 0.15);
+    --activity-bg: rgba(255, 255, 255, 0.05);
+    
+    /* Adjusted Semantic Colors */
+    --err-text: #fca5a5;
+    --err-border: rgba(159, 18, 57, 0.5);
+    --warn-text: #fcd34d;
+    --warn-icon: #fbbf24;
+    --warn-border: rgba(146, 64, 14, 0.5);
+    --disc-bg: rgba(245, 158, 11, 0.1);
+    --disc-border: rgba(180, 83, 9, 0.5);
+    --disc-text: #fde68a;
+  }
+
+  /* SMOOTH TRANSITIONS */
+  body, .card, .stat-card, .topic-chip, .msg, .chat-modal, .chat-input, 
+  .disclaimer, .badge-emergency, .q-tag, .chat-guard, .api-status, .nav-link, 
+  .stat-icon, .q-icon, .chat-head, .activity-bar-wrap {
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-base);
+    color: var(--text-main); 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* DYNAMIC BACKGROUND ORBS FOR GLASS EFFECT */
+  .bg-orbs {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    transition: all 0.5s ease;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    animation: float 20s infinite ease-in-out alternate;
+  }
+  .orb-1 { width: 600px; height: 600px; background: var(--bg-orb-1); top: -100px; left: -100px; }
+  .orb-2 { width: 500px; height: 500px; background: var(--bg-orb-2); bottom: -50px; right: -50px; animation-delay: -5s; }
+  .orb-3 { width: 400px; height: 400px; background: var(--bg-orb-3); top: 40%; left: 40%; animation-delay: -10s; opacity: 0.4; }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(50px, 30px) scale(1.1); }
+    100% { transform: translate(-30px, 50px) scale(0.9); }
+  }
+
+  /* GLASS UTILITY CLASS */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* NAV */
+  nav {
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; 
+    height: 70px; position: sticky; top: 0; z-index: 50; 
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+  }
+  .nav-logo{display:flex; align-items:center; gap:12px}
+  .logo-mark{width:38px; height:38px; background:var(--teal); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 12px rgba(15, 110, 86, 0.25);}
+  .logo-mark svg{width:20px; height:20px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+  .logo-text{font-family:'DM Serif Display',serif; font-size:22px; color:var(--teal); letter-spacing: -0.5px;}
+  .logo-text span{color:var(--coral)}
+  
+  .nav-links{display:flex; gap:8px}
+  .nav-link{padding:8px 16px; border-radius:10px; font-size:14px; color:var(--text-muted); font-weight: 500; cursor:pointer; border:none; background:none; font-family:'Inter', sans-serif;}
+  .nav-link:hover, .nav-link.active{background:var(--bg-alt); color:var(--teal); box-shadow: inset 0 0 0 1px var(--glass-border);}
+  
+  .nav-right{display:flex; align-items:center; gap:16px}
+  .badge-emergency{background:var(--err-light); color:var(--err-text); font-size:13px; font-weight:600; padding:6px 14px; border-radius:20px; border:1px solid var(--err-border); backdrop-filter: blur(4px);}
+  .avatar{width:40px; height:40px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:600; cursor:pointer;}
+  
+  /* THEME TOGGLE */
+  .theme-btn{background:var(--bg-alt); border:1px solid var(--glass-border); cursor:pointer; color:var(--text-muted); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:all .2s;}
+  .theme-btn:hover{background:var(--glass-bg-hover); color:var(--text-main);}
+  .theme-btn svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+  .sun-icon{display:none;}
+  [data-theme="dark"] .sun-icon{display:block;}
+  [data-theme="dark"] .moon-icon{display:none;}
+
+  /* LAYOUT CONTAINER */
+  .container{max-width:1160px; margin:0 auto; padding:2rem; flex:1; width:100%; position: relative; z-index: 1;}
+
+  /* GLASS HERO */
+  .hero-wrapper { max-width: 1160px; margin: 2rem auto 0; padding: 0 2rem; position: relative; z-index: 1;}
+  .hero {
+    background: linear-gradient(135deg, rgba(15, 110, 86, 0.8) 0%, rgba(29, 158, 117, 0.7) 100%);
+    backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2);
+    padding:3rem; color:#fff; position:relative; overflow:hidden; border-radius: 24px; box-shadow: var(--glass-shadow);
+  }
+  .hero::after{content:''; position:absolute; right:-60px; top:-40px; width:300px; height:300px; border-radius:50%; background:rgba(255,255,255,.1); filter: blur(20px);}
+  .hero::before{content:''; position:absolute; right:120px; bottom:-80px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.05); filter: blur(10px);}
+  .hero-label{font-size:13px; font-weight:600; letter-spacing:.08em; opacity:.9; text-transform:uppercase; margin-bottom:.75rem; display: inline-block; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px;}
+  .hero h1{font-family:'DM Serif Display',serif; font-size:2.5rem; line-height:1.15; margin-bottom:1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+  .hero p{font-size:15px; opacity:.95; max-width:480px; line-height:1.6; text-shadow: 0 1px 2px rgba(0,0,0,0.1);}
+  .hero-stats{display:flex; gap:3rem; margin-top:2rem}
+  .hstat{display:flex; flex-direction:column}
+  .hstat-val{font-size:28px; font-weight:700; letter-spacing: -0.5px;}
+  .hstat-lbl{font-size:13px; opacity:.9; font-weight: 500;}
+
+  /* GRIDS */
+  .grid-3{display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; margin-bottom:1.5rem}
+  .grid-2{display:grid; grid-template-columns:1.5fr 1fr; gap:1.5rem}
+
+  /* CARDS (Using Glass Class) */
+  .card { @extend .glass; border-radius:var(--radius); padding:1.5rem; }
+  .card-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem}
+  .card-title{font-size:15px; font-weight:600; color:var(--text-main)}
+  .card-meta{font-size:13px; font-weight:500; color:var(--text-muted)}
+
+  /* STAT CARDS */
+  .stat-card { @extend .glass; border-radius:var(--radius); padding:1.5rem; display: flex; flex-direction: column; }
+  .stat-icon{width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; border: 1px solid var(--glass-border-light);}
+  .stat-icon.teal{background:var(--teal-light); color:var(--teal);}
+  .stat-icon.coral{background:var(--coral-light); color:var(--coral);}
+  .stat-icon.amber{background:var(--warn-light); color:var(--warn-icon);}
+  .stat-icon svg{width:20px; height:20px}
+  .stat-val{font-size:28px; font-weight:700; color:var(--text-main); line-height:1; letter-spacing: -0.5px;}
+  .stat-lbl{font-size:13px; font-weight:500; color:var(--text-muted); margin-top:6px}
+  .stat-delta{font-size:13px; font-weight:600; margin-top:8px}
+  .delta-up{color:var(--teal)}
+  .delta-down{color:var(--coral)}
+
+  /* QUERY ROWS */
+  .query-row{display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--border-color)}
+  .query-row:last-child{border-bottom:none; padding-bottom:0}
+  .q-icon{width:38px; height:38px; border-radius:10px; background:var(--bg-alt); display:flex; align-items:center; justify-content:center; flex-shrink:0; border: 1px solid var(--glass-border);}
+  .q-icon svg{width:18px; height:18px; stroke:var(--text-muted); fill:none; stroke-width:1.8; stroke-linecap:round}
+  .q-text{font-size:14px; font-weight:500; color:var(--text-main); line-height:1.4; flex:1}
+  .q-time{font-size:12px; color:var(--text-muted); flex-shrink:0}
+  .q-tag{font-size:12px; padding:4px 10px; border-radius:20px; font-weight:600; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1);}
+  .q-tag.safe{background:var(--teal-light); color:var(--teal)}
+  .q-tag.warn{background:var(--warn-light); color:var(--warn-text)}
+  .q-tag.refer{background:var(--err-light); color:var(--err-text)}
+
+  /* GUARDRAILS */
+  .rail-item{display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-color)}
+  .rail-item:last-child{border-bottom:none}
+  .rail-dot{width:10px; height:10px; border-radius:50%; margin-top:6px; flex-shrink:0; box-shadow: 0 0 10px currentColor;}
+  .rail-dot.green{background:var(--teal-mid); color: var(--teal-mid);}
+  .rail-dot.amber{background:var(--warn-icon); color: var(--warn-icon);}
+  .rail-dot.red{background:var(--coral); color: var(--coral);}
+  .rail-text{font-size:14px; font-weight:600; color:var(--text-main); line-height:1.4}
+  .rail-sub{font-size:13px; color:var(--text-muted); margin-top:4px; line-height: 1.5;}
+
+  /* TOPIC CHIPS */
+  .topic-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .topic-chip{background:var(--bg-alt); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:12px 14px; cursor:pointer; display:flex; align-items:center; gap:10px}
+  .topic-chip:hover{background:var(--glass-bg-hover); border-color:var(--teal-mid)}
+  .topic-chip span{font-size:14px; font-weight:500; color:var(--text-main)}
+  .topic-chip .chip-icon{font-size:18px}
+
+  /* DISCLAIMER */
+  .disclaimer{background:var(--disc-bg); border:1px solid var(--disc-border); backdrop-filter: blur(8px); border-radius:var(--radius-sm); padding:1rem 1.25rem; display:flex; gap:12px; align-items:flex-start; margin-bottom:1.5rem; box-shadow: var(--glass-shadow);}
+  .disclaimer svg{width:20px; height:20px; stroke:var(--disc-border); fill:none; stroke-width:2; flex-shrink:0; margin-top:2px}
+  .disclaimer p{font-size:13px; font-weight:500; color:var(--disc-text); line-height:1.6}
+
+  /* ACTIVITY BAR */
+  .activity-row{display:flex; align-items:center; gap:12px; margin-bottom:12px}
+  .activity-bar-wrap{flex:1; height:8px; background:var(--activity-bg); border-radius:4px; overflow:hidden; border: 1px solid var(--glass-border);}
+  .activity-bar-fill{height:100%; border-radius:4px; background:var(--teal-mid); box-shadow: 0 0 10px var(--teal-mid);}
+  .activity-label{font-size:13px; font-weight:500; color:var(--text-muted); width:85px}
+  .activity-count{font-size:13px; font-weight:600; color:var(--text-main); width:32px; text-align:right}
+
+  /* CHAT UI ELEMENTS (Shared between Global and Portals) */
+  .chat-messages{flex:1; overflow-y:auto; padding:1.25rem; display:flex; flex-direction:column; gap:12px; min-height:260px}
+  .chat-messages::-webkit-scrollbar { width: 6px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+  
+  .msg{max-width:85%; font-size:14px; line-height:1.6; padding:12px 16px; border-radius:16px; backdrop-filter: blur(4px);}
+  .msg.bot{background:var(--bg-alt); color:var(--text-main); border-bottom-left-radius:4px; align-self:flex-start; border:1px solid var(--glass-border)}
+  
+  /* Distinguish User Colors Based on Portal */
+  .msg.user{background:var(--teal); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; box-shadow: 0 4px 12px rgba(15,110,86,0.2);}
+  .msg.user.patient { background: var(--teal); }
+  .msg.user.doctor { background: var(--coral); box-shadow: 0 4px 12px rgba(225,29,72,0.2); }
+  
+  .msg.error{background:var(--err-light); color:var(--err-text); border:1px solid var(--err-border); align-self:flex-start; border-bottom-left-radius:4px}
+  .msg-time{font-size:11px; font-weight:600; color:var(--text-muted); text-align:center; margin:8px 0}
+  
+  .chat-input-row{padding:1rem; border-top:1px solid var(--border-color); display:flex; gap:10px; align-items:flex-end}
+  .chat-input{flex:1; border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; font-size:14px; font-family:'Inter',sans-serif; outline:none; resize:none; min-height:44px; max-height:120px; color:var(--text-main); background:var(--bg-alt); backdrop-filter: blur(8px);}
+  .chat-input:focus{border-color:var(--teal-mid); box-shadow: 0 0 0 3px var(--teal-light);}
+  
+  .chat-send{width:44px; height:44px; background:var(--teal); border:none; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background-color .2s; box-shadow: 0 4px 10px rgba(15,110,86,0.3);}
+  .chat-send:hover{background:var(--teal-mid);}
+  .chat-send:disabled{opacity:.5; cursor:not-allowed; box-shadow: none;}
+  .chat-send svg{width:18px; height:18px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+
+  /* Specific Doctor Input styling */
+  .chat-input.doctor:focus { border-color:var(--coral); box-shadow: 0 0 0 3px var(--coral-light); }
+  
+  .typing{display:flex; gap:6px; align-items:center; padding:12px 16px; background:var(--bg-alt); border:1px solid var(--glass-border); border-radius:16px; border-bottom-left-radius:4px; align-self:flex-start}
+  .typing span{width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:bounce .9s infinite}
+  .typing span:nth-child(2){animation-delay:.15s}
+  .typing span:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+  /* PORTAL ACTION BUTTONS */
+  .portal-btn { width: 100%; padding: 12px; margin-top: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+  .portal-btn-patient { border: 1px solid var(--teal); background: transparent; color: var(--teal); }
+  .portal-btn-patient:hover { background: var(--teal-light); }
+  .portal-btn-doctor { border: 1px solid var(--coral); background: transparent; color: var(--coral); }
+  .portal-btn-doctor:hover { background: var(--coral-light); }
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+    </div>
+    <span class="logo-text">Verita<span>AI</span></span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-link" onclick="showPage('portals')">Portals</button>
+    <button class="nav-link" onclick="showPage('analytics')">Analytics</button>
+    <button class="nav-link" onclick="showPage('guardrails')">Guardrails</button>
+    <button class="nav-link" onclick="showPage('about')">About</button>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+      <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <div class="badge-emergency">⚕ Emergency: 108</div>
+    <div class="avatar">HS</div>
+  </div>
+</nav>
+
+<div class="hero-wrapper">
+  <div class="hero">
+    <div class="hero-label">MedAI Health Platform · RAG-powered</div>
+    <h1>Your AI-powered<br>health companion</h1>
+    <p>Get instant, evidence-based answers to your health questions — powered by a medical knowledge base with strict guardrails.</p>
+    <div class="hero-stats">
+      <div class="hstat"><span class="hstat-val">1,240+</span><span class="hstat-lbl">Queries answered</span></div>
+      <div class="hstat"><span class="hstat-val">98.4%</span><span class="hstat-lbl">Safe response rate</span></div>
+      <div class="hstat"><span class="hstat-val">Llama 3.3</span><span class="hstat-lbl">70B model · Groq</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div id="page-dashboard">
+    <div class="disclaimer">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p><strong>Medical Disclaimer:</strong> MedAI provides general health information only and does not replace professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for medical concerns.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="stat-card glass"><div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="stat-val">1,240</div><div class="stat-lbl">Total queries</div><div class="stat-delta delta-up">↑ 18% this week</div></div>
+      <div class="stat-card glass"><div class="stat-icon coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="stat-val">23</div><div class="stat-lbl">Escalated to doctor</div><div class="stat-delta delta-down">↑ 4 today</div></div>
+      <div class="stat-card glass"><div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-val">98.4%</div><div class="stat-lbl">Safe response rate</div><div class="stat-delta delta-up" style="color:var(--warn-icon)">RAG guardrailed</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card glass">
+        <div class="card-header"><span class="card-title">Recent queries</span><span class="card-meta">Last 24 hours</span></div>
+        <div class="query-row"><div class="q-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="flex:1"><div class="q-text">What are symptoms of type 2 diabetes?</div><div class="q-time">2 min ago</div></div><span class="q-tag safe">Safe</span></div>
+        <div class="query-row"><div class="q-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="flex:1"><div class="q-text">How much paracetamol can I take daily?</div><div class="q-time">11 min ago</div></div><span class="q-tag warn">Caution</span></div>
+        <div class="query-row"><div class="q-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="flex:1"><div class="q-text">I have severe chest pain and can't breathe</div><div class="q-time">38 min ago</div></div><span class="q-tag refer">Referred</span></div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:1.5rem">
+        <div class="card glass">
+          <div class="card-header"><span class="card-title">Query topics</span><span class="card-meta">This week</span></div>
+          <div class="activity-row"><span class="activity-label">Symptoms</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:80%"></div></div><span class="activity-count">412</span></div>
+          <div class="activity-row"><span class="activity-label">Nutrition</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:55%"></div></div><span class="activity-count">284</span></div>
+          <div class="activity-row"><span class="activity-label">Medication</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:45%"></div></div><span class="activity-count">231</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-portals" style="display:none">
+    <div class="card glass" style="margin-bottom:1.5rem">
+      <div class="card-header"><span class="card-title">Role-Based Access Portals</span><span class="card-meta">Interactive Chat</span></div>
+      <p style="font-size:14px; color:var(--text-muted); line-height:1.6">Test how the RAG model and guardrails respond differently based on the user's portal. (Client-side emergency filters are relaxed for Providers).</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card glass" style="border-top: 4px solid var(--teal-mid); display: flex; flex-direction: column;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom: 1.5rem;">
+          <div class="avatar" style="background:var(--teal)">JD</div>
+          <div>
+            <div style="font-size:16px; font-weight:600; color:var(--text-main);">Patient Portal</div>
+            <div style="font-size:12px; color:var(--text-muted);">Viewing as: Jane Doe</div>
+          </div>
+        </div>
+        
+        <div id="patient-overview" style="flex:1;">
+          <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:var(--text-main)">My Health Overview</div>
+          <div class="grid-2" style="gap:10px; grid-template-columns: 1fr 1fr; margin-bottom:1.5rem;">
+            <div style="background:var(--bg-alt); padding:12px; border-radius:12px; border:1px solid var(--border-color);">
+              <div style="font-size:12px; color:var(--text-muted)">Latest Vitals</div>
+              <div style="font-size:16px; font-weight:600; color:var(--teal); margin-top:4px">120/80</div>
+            </div>
+            <div style="background:var(--bg-alt); padding:12px; border-radius:12px; border:1px solid var(--border-color);">
+              <div style="font-size:12px; color:var(--text-muted)">Next Appt</div>
+              <div style="font-size:14px; font-weight:600; color:var(--text-main); margin-top:4px">Oct 24</div>
+            </div>
+          </div>
+          <button class="portal-btn portal-btn-patient" onclick="togglePortalChat('patient', true)">Launch Personal AI Assistant</button>
+        </div>
+
+        <div id="patient-chat" style="display:none; flex-direction:column; flex:1; border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <span style="font-size:13px; font-weight:600; color:var(--teal);">Personal Health Assistant</span>
+            <button style="background:none; border:none; font-size:12px; cursor:pointer; color:var(--text-muted);" onclick="togglePortalChat('patient', false)">Close</button>
+          </div>
+          <div class="chat-messages" id="patientChatMessages" style="flex:1; min-height: 280px; max-height:280px; padding:0 5px 10px 0; margin-bottom:10px;">
+            <div class="msg bot">Hi Jane! I'm your AI health assistant. What symptoms or questions do you have today?</div>
+          </div>
+          <div class="chat-input-row" style="padding:0; border:none;">
+            <textarea class="chat-input" id="patientChatInput" placeholder="Ask about symptoms, meds..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPortalMsg('patient')}" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button class="chat-send" style="background:var(--teal)" onclick="sendPortalMsg('patient')">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card glass" style="border-top: 4px solid var(--coral); display: flex; flex-direction: column;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom: 1.5rem;">
+          <div class="avatar" style="background:var(--coral)">SJ</div>
+          <div>
+            <div style="font-size:16px; font-weight:600; color:var(--text-main);">Provider Portal</div>
+            <div style="font-size:12px; color:var(--text-muted);">Viewing as: Dr. Sarah Jenkins</div>
+          </div>
+        </div>
+        
+        <div id="doctor-overview" style="flex:1;">
+          <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:var(--text-main)">Action Required</div>
+          <div class="grid-2" style="gap:10px; grid-template-columns: 1fr 1fr; margin-bottom:1.5rem;">
+            <div style="background:var(--err-light); padding:12px; border-radius:12px; border:1px solid var(--err-border);">
+              <div style="font-size:12px; color:var(--err-text); font-weight:500;">AI Escalations</div>
+              <div style="font-size:20px; font-weight:700; color:var(--err-text); margin-top:4px">23</div>
+            </div>
+            <div style="background:var(--bg-alt); padding:12px; border-radius:12px; border:1px solid var(--border-color);">
+              <div style="font-size:12px; color:var(--text-muted)">Patient Queue</div>
+              <div style="font-size:20px; font-weight:700; color:var(--text-main); margin-top:4px">8</div>
+            </div>
+          </div>
+          <button class="portal-btn portal-btn-doctor" onclick="togglePortalChat('doctor', true)">Launch Clinical AI Copilot</button>
+        </div>
+
+        <div id="doctor-chat" style="display:none; flex-direction:column; flex:1; border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <span style="font-size:13px; font-weight:600; color:var(--coral);">Clinical AI Copilot</span>
+            <button style="background:none; border:none; font-size:12px; cursor:pointer; color:var(--text-muted);" onclick="togglePortalChat('doctor', false)">Close</button>
+          </div>
+          <div class="chat-messages" id="doctorChatMessages" style="flex:1; min-height: 280px; max-height:280px; padding:0 5px 10px 0; margin-bottom:10px;">
+            <div class="msg bot">Hello Dr. Jenkins. I am connected to the RAG database. What medical research or interactions do you need to check?</div>
+          </div>
+          <div class="chat-input-row" style="padding:0; border:none;">
+            <textarea class="chat-input doctor" id="doctorChatInput" placeholder="Ask clinical queries..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPortalMsg('doctor')}" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button class="chat-send" style="background:var(--coral); box-shadow: 0 4px 10px rgba(225,29,72,0.3);" onclick="sendPortalMsg('doctor')">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-analytics" style="display:none">
+    <div class="card glass" style="margin-bottom:1.5rem">
+      <div class="card-header"><span class="card-title">Platform analytics</span><span class="card-meta">Live data</span></div>
+      <div class="grid-3" style="margin-bottom:0">
+        <div style="text-align:center; padding:1.5rem; border-right:1px solid var(--border-color)">
+          <div style="font-size:36px; font-weight:700; color:var(--teal); letter-spacing: -1px; text-shadow: 0 0 10px var(--teal-light);">98.4%</div>
+          <div style="font-size:14px; font-weight:500; color:var(--text-muted); margin-top:8px">Safe response rate</div>
+        </div>
+        <div style="text-align:center; padding:1.5rem; border-right:1px solid var(--border-color)">
+          <div style="font-size:36px; font-weight:700; color:var(--coral); letter-spacing: -1px; text-shadow: 0 0 10px var(--coral-light);">1.8%</div>
+          <div style="font-size:14px; font-weight:500; color:var(--text-muted); margin-top:8px">Emergency escalations</div>
+        </div>
+        <div style="text-align:center; padding:1.5rem">
+          <div style="font-size:36px; font-weight:700; color:var(--warn-icon); letter-spacing: -1px; text-shadow: 0 0 10px var(--warn-light);">0%</div>
+          <div style="font-size:14px; font-weight:500; color:var(--text-muted); margin-top:8px">Guardrail violations</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card glass">
+        <div class="card-title" style="margin-bottom:1.25rem">Daily query volume</div>
+        <div class="activity-row"><span class="activity-label">Monday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:60%"></div></div><span class="activity-count">163</span></div>
+        <div class="activity-row"><span class="activity-label">Tuesday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:75%"></div></div><span class="activity-count">204</span></div>
+        <div class="activity-row"><span class="activity-label">Wednesday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:88%"></div></div><span class="activity-count">239</span></div>
+        <div class="activity-row"><span class="activity-label">Thursday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:70%"></div></div><span class="activity-count">190</span></div>
+        <div class="activity-row"><span class="activity-label">Friday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:100%"></div></div><span class="activity-count">272</span></div>
+        <div class="activity-row"><span class="activity-label">Saturday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:45%"></div></div><span class="activity-count">122</span></div>
+        <div class="activity-row"><span class="activity-label">Sunday</span><div class="activity-bar-wrap"><div class="activity-bar-fill" style="width:38%"></div></div><span class="activity-count">103</span></div>
+      </div>
+      <div class="card glass">
+        <div class="card-title" style="margin-bottom:1.25rem">Response classification</div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--teal-light); border: 1px solid var(--border-color); border-radius:12px; backdrop-filter: blur(4px);">
+            <div><div style="font-size:15px; font-weight:600; color:var(--teal)">Safe responses</div><div style="font-size:13px; font-weight:500; color:var(--teal-mid); margin-top:2px;">General health info</div></div>
+            <div style="font-size:24px; font-weight:700; color:var(--teal)">1,218</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--warn-light); border: 1px solid var(--border-color); border-radius:12px; backdrop-filter: blur(4px);">
+            <div><div style="font-size:15px; font-weight:600; color:var(--warn-text)">Caution flagged</div><div style="font-size:13px; font-weight:500; color:var(--warn-icon); margin-top:2px;">Advised consultation</div></div>
+            <div style="font-size:24px; font-weight:700; color:var(--warn-text)">45</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--err-light); border: 1px solid var(--border-color); border-radius:12px; backdrop-filter: blur(4px);">
+            <div><div style="font-size:15px; font-weight:600; color:var(--err-text)">Emergency referred</div><div style="font-size:13px; font-weight:500; color:var(--coral); margin-top:2px;">Directed to 108</div></div>
+            <div style="font-size:24px; font-weight:700; color:var(--err-text)">23</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-guardrails" style="display:none">
+    <div class="card glass" style="margin-bottom:1.5rem">
+      <div class="card-header">
+        <span class="card-title">Active guardrails</span>
+        <span style="font-size:12px; background:var(--teal-light); color:var(--teal); padding:6px 12px; border-radius:20px; font-weight:600; border: 1px solid rgba(255,255,255,0.1);">All active</span>
+      </div>
+      <div class="rail-item"><div class="rail-dot green"></div><div><div class="rail-text">Emergency detection & escalation</div><div class="rail-sub">Detects critical symptoms (chest pain, breathing difficulty, stroke signs) and immediately redirects to emergency services (108)</div></div></div>
+      <div class="rail-item"><div class="rail-dot green"></div><div><div class="rail-text">No diagnosis policy</div><div class="rail-sub">The RAG bot never provides a definitive diagnosis — always frames responses as general information and advises professional consultation</div></div></div>
+      <div class="rail-item"><div class="rail-dot green"></div><div><div class="rail-text">Medication dosage guardrail</div><div class="rail-sub">Queries about specific dosages trigger a caution flag and recommend consulting a pharmacist or doctor</div></div></div>
+      <div class="rail-item"><div class="rail-dot green"></div><div><div class="rail-text">Mental health sensitivity filter</div><div class="rail-sub">Detects self-harm or crisis language and provides mental health helpline (iCall: 9152987821) instead of generic responses</div></div></div>
+      <div class="rail-item"><div class="rail-dot amber"></div><div><div class="rail-text">Unverified treatment warning</div><div class="rail-sub">Flags questions about unproven or alternative treatments with a disclaimer before responding</div></div></div>
+      <div class="rail-item"><div class="rail-dot green"></div><div><div class="rail-text">Pediatric & pregnancy safety</div><div class="rail-sub">All responses involving children or pregnancy are prefixed with a mandatory consultation advisory before any content</div></div></div>
+    </div>
+    <div class="card glass">
+      <div class="card-title" style="margin-bottom:1rem">Guardrail trigger log (today)</div>
+      <div class="query-row"><div class="q-text">Emergency trigger: "severe chest pain"</div><span class="q-tag refer">Escalated</span></div>
+      <div class="query-row"><div class="q-text">Medication query: paracetamol + alcohol interaction</div><span class="q-tag warn">Caution</span></div>
+      <div class="query-row"><div class="q-text">Dosage query: insulin units per meal</div><span class="q-tag warn">Caution</span></div>
+      <div class="query-row" style="border-bottom:none"><div class="q-text">Mental health flag: "feeling hopeless lately"</div><span class="q-tag refer">Helpline</span></div>
+    </div>
+  </div>
+
+  <div id="page-about" style="display:none">
+    <div class="card glass">
+      <div class="card-title" style="margin-bottom:1.25rem; font-size:18px">About MedAI</div>
+      <p style="font-size:15px; color:var(--text-muted); line-height:1.7; margin-bottom:2rem">MedAI is a RAG-powered general health Q&A platform built for a medical hackathon. It delivers evidence-based health information through a conversational chatbot backed by a medical knowledge base indexed on Pinecone, with Llama 3.3 70B running on Groq for ultra-fast inference.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem">
+        <div style="padding:1.5rem; background:var(--bg-alt); border: 1px solid var(--border-color); border-radius:16px; backdrop-filter: blur(4px);">
+          <div style="font-size:14px; font-weight:600; color:var(--text-main); margin-bottom:.75rem">AI stack</div>
+          <div style="font-size:14px; color:var(--text-muted); line-height:2">Llama 3.3 70B (Groq)<br>LangChain RAG<br>Pinecone vector DB<br>HuggingFace embeddings</div>
+        </div>
+        <div style="padding:1.5rem; background:var(--bg-alt); border: 1px solid var(--border-color); border-radius:16px; backdrop-filter: blur(4px);">
+          <div style="font-size:14px; font-weight:600; color:var(--text-main); margin-bottom:.75rem">Backend</div>
+          <div style="font-size:14px; color:var(--text-muted); line-height:2">Python / Flask<br>REST API (/api/chat)<br>Flask-CORS enabled<br>Similarity search (k=3)</div>
+        </div>
+        <div style="padding:1.5rem; background:var(--bg-alt); border: 1px solid var(--border-color); border-radius:16px; backdrop-filter: blur(4px);">
+          <div style="font-size:14px; font-weight:600; color:var(--text-main); margin-bottom:.75rem">Features</div>
+          <div style="font-size:14px; color:var(--text-muted); line-height:2">24/7 health Q&A<br>Emergency escalation<br>Medical guardrails<br>Admin dashboard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="display:none;" id="chatModal"></div> 
+<button style="display:none;" id="sendBtn"></button>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  }
+
+  const API_URL = "http://localhost:8080/api/chat";
+
+  const EMERGENCY_KEYWORDS = [
+    'chest pain','can\'t breathe','cannot breathe','heart attack','stroke',
+    'unconscious','not breathing','severe bleeding','overdose',
+    'suicide','kill myself','can\'t feel','paralyzed'
+  ];
+  
+  const EDUCATIONAL_BYPASS = [
+    'what are', 'symptoms', 'signs of', 'define', 'explain', 'how to', 'difference between'
+  ];
+
+  const CAUTION_KEYWORDS = [
+    'dosage','how much mg','how many tablets','how many pills',
+    'paracetamol','ibuprofen','insulin dose','overdose on'
+  ];
+
+  let isLoading = false;
+
+  function isEmergency(msg) {
+    const m = msg.toLowerCase();
+    const hasEmergencyWord = EMERGENCY_KEYWORDS.some(k => m.includes(k));
+    
+    if (hasEmergencyWord) {
+      const isEducational = EDUCATIONAL_BYPASS.some(b => m.includes(b));
+      const isPersonal = m.includes('i have') || m.includes('my ') || m.includes('i am');
+      
+      if (isEducational && !isPersonal) return false; 
+      return true;
+    }
+    return false;
+  }
+
+  function isCaution(msg) {
+    const m = msg.toLowerCase();
+    return CAUTION_KEYWORDS.some(k => m.includes(k));
+  }
+
+  function togglePortalChat(portalType, show) {
+    document.getElementById(`${portalType}-overview`).style.display = show ? 'none' : 'block';
+    document.getElementById(`${portalType}-chat`).style.display = show ? 'flex' : 'none';
+  }
+
+  function appendPortalMsg(text, role, portalType) {
+    const msgs = document.getElementById(`${portalType}ChatMessages`);
+    const d = document.createElement('div');
+    
+    let className = 'msg ' + role;
+    if (role === 'user') className += ' ' + portalType;
+    d.className = className;
+    
+    d.textContent = text;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showPortalTyping(portalType) {
+    const msgs = document.getElementById(`${portalType}ChatMessages`);
+    const t = document.createElement('div');
+    t.className = 'typing'; t.id = `typingIndicator-${portalType}`;
+    t.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(t);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+  
+  function removePortalTyping(portalType) { 
+    const t = document.getElementById(`typingIndicator-${portalType}`); 
+    if (t) t.remove(); 
+  }
+
+  async function sendPortalMsg(portalType) {
+    if (isLoading) return;
+    const inp = document.getElementById(`${portalType}ChatInput`);
+    const val = inp.value.trim();
+    if (!val) return;
+
+    inp.value = ''; inp.style.height = 'auto';
+    appendPortalMsg(val, 'user', portalType);
+
+    // Apply strict guardrails ONLY to the Patient portal. Doctors bypass the panic filter.
+    if (portalType === 'patient') {
+        if (isEmergency(val)) {
+            appendPortalMsg('🚨 This sounds like a medical emergency. Please call 108 immediately or go to the nearest emergency room. Do not delay — your safety comes first.', 'error', portalType);
+            return;
+        }
+    }
+
+    // Apply caution prefix for dosages (only for patients)
+    const cautionPrefix = isCaution(val) && portalType === 'patient'
+      ? '⚠️ Note: Questions about specific medication dosages require professional verification.\n\n'
+      : '';
+
+    isLoading = true;
+    showPortalTyping(portalType);
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            message: val, 
+            role: portalType // Passes 'patient' or 'doctor' to Flask
+        })
+      });
+
+      removePortalTyping(portalType);
+
+      if (!res.ok) throw new Error('Server error');
+
+      const data = await res.json();
+      appendPortalMsg(cautionPrefix + data.answer, 'bot', portalType);
+
+    } catch (err) {
+      removePortalTyping(portalType);
+      appendPortalMsg('Unable to reach the VeritaAI backend.', 'error', portalType);
+      console.error(err);
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  function showPage(p) {
+    ['dashboard', 'portals', 'analytics', 'guardrails', 'about'].forEach(id => {
+      document.getElementById('page-' + id).style.display = id === p ? 'block' : 'none';
+    });
+    document.querySelectorAll('.nav-link').forEach(el => {
+      if (el.textContent.toLowerCase().trim() === p) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+  }
+</script>
+</body>
+</html>
