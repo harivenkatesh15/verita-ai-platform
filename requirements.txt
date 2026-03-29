@@ -2,12 +2,11 @@ Flask>=3.0.0
 flask-cors>=4.0.0
 python-dotenv>=1.0.0
 gunicorn>=21.0.0
-langchain>=0.1.0
-langchain-community>=0.0.1  <-- ADD THIS LINE
-langchain-classic>=0.0.1
-langchain-groq>=0.1.0
-langchain-pinecone>=0.0.1
-langchain-huggingface>=0.0.1
-pinecone-client>=3.0.0
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-groq==0.1.9
+langchain-pinecone==0.1.3
+langchain-huggingface==0.0.3
+pinecone-client==5.0.1
 sentence-transformers>=2.2.0
-pypdf>=4.0.0                 <-- ALSO ADD THIS (needed for PyPDFLoader)
+pypdf>=4.0.0
